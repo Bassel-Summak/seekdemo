@@ -19,7 +19,7 @@ class JobCollectionUseCase @Inject constructor(
         val request = JobCollectionRequest(variables = JobCollectionRequest.Variables(
             limit = limit,
             page = page,
-            positionTitle = positionTitle,
+            positiontitle = positionTitle,
             appliedonly = appliedOnly
         ))
 
@@ -29,7 +29,10 @@ class JobCollectionUseCase @Inject constructor(
             }
 
             is NetworkResult.Success -> {
-                Resource.Success(mapper.map(result.result.data))
+                val job = mapper.map(result.result.data)
+                job.query = positionTitle
+                job.isAppliedOnly = appliedOnly
+                Resource.Success(job)
             }
         }
     }

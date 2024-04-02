@@ -96,15 +96,22 @@ export const getPaginatedActiveJobsHandler: Handler = async (req, res) => {
 
     let filteredJobs = jobsWithApplied
 
-    console.log("Value of appliedonly:", appliedonly);
 
     if (appliedonly === 'true'){
           filteredJobs = jobsWithApplied.filter((job) => job._doc.haveIApplied === true);
     }
 
+    if (positiontitle && positiontitle.trim() !== '') {
+          const lowerCasePositionTitle = positiontitle.toLowerCase();
+          filteredJobs = filteredJobs.filter((job) => job._doc.positionTitle.toLowerCase().includes(positiontitle));
+    }
+
+
+
+
     const response: GetJobsResponse = {
       page: Number(page),
-      size: jobs.length,
+      size: filteredJobs.length,
       total,
       hasNext,
       jobs: filteredJobs,

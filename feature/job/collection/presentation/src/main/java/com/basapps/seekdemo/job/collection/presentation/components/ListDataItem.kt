@@ -98,7 +98,7 @@ fun ListDataItem(
                         )
 
                         Text(
-                            text = "No Job has been applied :(",
+                            text = "No Job to show :(",
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(top = 8.dp)
@@ -172,7 +172,7 @@ fun ListDataItem(
 
                 }
 
-                is JobListStatus.AddData -> TODO()
+                is JobListStatus.None -> {}
             }
     }
     }

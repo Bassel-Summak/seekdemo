@@ -12,13 +12,16 @@ data class JobCollectionUiState (
 sealed class JobListStatus {
     data object Loading : JobListStatus()
     data object Empty : JobListStatus()
+
+    data object None : JobListStatus()
+
     data object Retrying : JobListStatus()
     data class ShowData(val jobsList: JobsCollection) : JobListStatus()
-    data class AddData(val newJobsList: JobsCollection) : JobListStatus()
 }
 
 
 sealed class Tab {
     data object  ActiveJobs : Tab()
+    data object  Search : Tab()
     data object  Applied : Tab()
 }

@@ -12,10 +12,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -47,11 +49,17 @@ fun  JobCollectionScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver{_,event ->
             if (event == Lifecycle.Event.ON_RESUME){
-                if (uiState.value.tabUI == Tab.ActiveJobs)
-                viewModel.onEvent(JobCollectionUiEvent.GetJobCollection)
-                else
-                viewModel.onEvent(JobCollectionUiEvent.GetAppliedJobs)
-
+                if (uiState.value.jobListStatus is JobListStatus.ShowData){
+                    if (uiState.value.tabUI == Tab.ActiveJobs)
+                        viewModel.onEvent(JobCollectionUiEvent.GetJobCollection)
+                    else if (uiState.value.tabUI == Tab.Applied)
+                        viewModel.onEvent(JobCollectionUiEvent.GetAppliedJobs)
+                    else if (uiState.value.tabUI == Tab.Search){
+                        if (uiState.value.jobListStatus is JobListStatus.ShowData){
+                            viewModel.onEvent(JobCollectionUiEvent.GetQueryJobs((uiState.value.jobListStatus as JobListStatus.ShowData).jobsList.query))
+                        }
+                    }
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -90,10 +98,21 @@ fun JobCollection(
             AppBar(
                 title = "Home",
                 navIcon = Icons.Filled.ArrowBack,
-                isSearchEnabled = false,
+                isSearchEnabled = true,
+                isSearchUIVisible = uiState.tabUI == Tab.Search,
                 isProfileEnabled = true,
                 onProfile = {onNavigateToProfile()},
                 onNavBack = { navController.navigateUp() },
+                onSearch = {
+                    onEvent(JobCollectionUiEvent.GetQueryJobs(it))
+                },
+                onSearchUIVisible = {
+                    onEvent(JobCollectionUiEvent.ShowSearchUI)
+
+                },
+                onCloseSearchPressed = {
+                    onEvent(JobCollectionUiEvent.GetJobCollection)
+                }
             )
         }
 
@@ -101,32 +120,47 @@ fun JobCollection(
     Box(modifier = Modifier.padding(innerPadding)) {
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top= 16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
 
             // Job List and its options view
 
 
+
+
+
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
+                if (uiState.tabUI == Tab.Search){
+                    var searchResults = ""
+                    if (uiState.jobListStatus is JobListStatus.ShowData){
+                        searchResults = "Search results for " + uiState.jobListStatus.jobsList.query
+                    }
+                    Box {
+                        Text(text = searchResults)
+                    }
+                }
+                else {
+                    RectangularButton(
+                        text = "Open Jobs",
+                        onClick = { onEvent(JobCollectionUiEvent.GetJobCollection) },
+                        selected = uiState.tabUI == Tab.ActiveJobs,
+                        modifier = Modifier.weight(1f)
+                    )
 
-                RectangularButton(
-                    text = "Open Jobs",
-                    onClick = { onEvent(JobCollectionUiEvent.GetJobCollection) },
-                    selected = uiState.tabUI == Tab.ActiveJobs,
-                    modifier = Modifier.weight(1f)
-                )
-
-                RectangularButton(
-                    text = "Applied Jobs",
-                    onClick = { onEvent(JobCollectionUiEvent.GetAppliedJobs) },
-                    selected = uiState.tabUI == Tab.Applied,
-                    modifier = Modifier.weight(1f)
-                )
+                    RectangularButton(
+                        text = "Applied Jobs",
+                        onClick = { onEvent(JobCollectionUiEvent.GetAppliedJobs) },
+                        selected = uiState.tabUI == Tab.Applied,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
             }
 

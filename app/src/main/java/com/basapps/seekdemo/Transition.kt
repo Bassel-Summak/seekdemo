@@ -42,3 +42,4 @@ fun NavGraphBuilder.setComposable(
         content = content
     )
 }
+

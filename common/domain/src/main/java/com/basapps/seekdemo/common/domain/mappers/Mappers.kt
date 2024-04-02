@@ -55,7 +55,7 @@ class JobCollectionsMapper @Inject constructor(private val mapper: JobMapper) : 
             isThereMorePages = from.active.hasNext,
             page = from.active.page,
             size = from.active.size,
-            total = from.active.total
+            total = from.active.total,
         )
     }
 

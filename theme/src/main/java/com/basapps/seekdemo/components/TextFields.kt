@@ -14,10 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -33,10 +36,12 @@ import com.basapps.seekdemo.theme.AppTheme
 
 @Composable
 fun AppTextField(
+    modifier: Modifier = Modifier,
     value: String,
     @StringRes label: Int,
     hint: String = "",
     maxChar : Int =-1,
+    backgroundColor: Color? = null,
     onValueChanged: (value: String) -> Unit,
     isPasswordField: Boolean = false,
     isClickOnly: Boolean = false,
@@ -51,12 +56,12 @@ fun AppTextField(
 
 
         Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(90.dp),
     ) {
         TextField(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .clickable {
                     if (isClickOnly) {
@@ -81,7 +86,7 @@ fun AppTextField(
                     )
                 }
             },
-            visualTransformation = if (isPasswordField) PasswordVisualTransformation() else VisualTransformation.None,
+                    visualTransformation = if (isPasswordField) PasswordVisualTransformation() else VisualTransformation.None,
             label = { Text(text = stringResource(label)) },
             placeholder = { Text(text = hint) },
             leadingIcon = {
@@ -89,18 +94,35 @@ fun AppTextField(
                     Icon(it, hint, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
+
+            colors = if (backgroundColor!=null) { // Replace 'condition' with your actual condition
+                TextFieldDefaults.colors(
+                    focusedContainerColor = backgroundColor,
+                    unfocusedContainerColor = backgroundColor,
+                    disabledTextColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+
+                )
+            } else {
+                TextFieldDefaults.colors() // Default colors
+            },
+
             trailingIcon = {
                 if (error != null) {
                     Icon(Icons.Filled.Info, "error", tint = MaterialTheme.colorScheme.error)
                 }
             },
-
-            keyboardActions = KeyboardActions(
+                    keyboardActions = KeyboardActions(
                 onDone = {
-                    focusManager.clearFocus()
-                    onDone()
+                        focusManager.clearFocus()
+                        onDone()
+
                 },
                 onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                        onSearch = {
+                            focusManager.clearFocus()
+                            onDone()
+                        }
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,

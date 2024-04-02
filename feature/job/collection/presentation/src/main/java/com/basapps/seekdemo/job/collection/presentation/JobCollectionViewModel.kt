@@ -38,6 +38,15 @@ class JobCollectionViewModel @Inject constructor(
                 _uiState.update { it.copy(tabUI =Tab.Applied, jobListStatus = JobListStatus.Loading) }
             }
 
+            is JobCollectionUiEvent.GetQueryJobs -> {
+                viewModelScope.coroutineContext.cancelChildren()
+                getJobListQuery(uiEvent.data)
+                _uiState.update { it.copy(tabUI =Tab.Search, jobListStatus = JobListStatus.Loading) }
+            }
+            is JobCollectionUiEvent.ShowSearchUI -> {
+                viewModelScope.coroutineContext.cancelChildren()
+                _uiState.update { it.copy(tabUI =Tab.Search,jobListStatus = JobListStatus.None) }
+            }
         }
     }
 
@@ -68,6 +77,28 @@ class JobCollectionViewModel @Inject constructor(
         }
     }
 
+    private fun getJobListQuery(query:String) = viewModelScope.launch {
+
+        _uiState.update { it.copy(isListRequested = true) }
+
+        when (val loginResult = jobCollectionUseCase.invoke(5, 1, positionTitle = query)) {
+            is Resource.Success -> {
+                if (loginResult.result.jobs.isEmpty())
+                    _uiState.update { it.copy(jobListStatus = JobListStatus.Empty) }
+                else
+                    _uiState.update { it.copy(jobListStatus = JobListStatus.ShowData(loginResult.result)) }
+
+                enableListRequests()
+            }
+            is Resource.Error -> {
+                _uiState.update { it.copy(jobListStatus = JobListStatus.Retrying) }
+                enableListRequests()
+
+            }
+        }
+    }
+
+
     private fun enableListRequests(){
         _uiState.update { it.copy(isListRequested = false) }
 
@@ -77,7 +108,19 @@ class JobCollectionViewModel @Inject constructor(
 
         _uiState.update { it.copy(isListRequested = true) }
 
-        when (val loginResult = jobCollectionUseCase.invoke(5, pageNum, appliedOnly = uiState.value.tabUI == Tab.Applied)) {
+        var appliedOnly = false
+        var positionTitle = ""
+        when (val data = uiState.value.jobListStatus){
+            is JobListStatus.ShowData ->{
+                positionTitle = data.jobsList.query
+                appliedOnly = data.jobsList.isAppliedOnly
+            }
+            else ->{
+
+            }
+        }
+
+        when (val loginResult = jobCollectionUseCase.invoke(5, pageNum, appliedOnly = appliedOnly, positionTitle = positionTitle)) {
             is Resource.Success -> {
 
 

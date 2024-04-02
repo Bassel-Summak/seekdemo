@@ -6,5 +6,7 @@ data class JobsCollection(
     var isThereMorePages :Boolean,
     var page: Int,
     var size: Int,
-    var total: Int
+    var total: Int,
+    var query: String = "",
+    var isAppliedOnly: Boolean = false
 )

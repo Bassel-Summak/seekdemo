@@ -26,7 +26,7 @@ data class JobCollectionRequest(
     data class Variables(
         val limit: Int,
         val page: Int,
-        val positionTitle: String,
+        val positiontitle: String,
         val appliedonly: Boolean
     )
 }
