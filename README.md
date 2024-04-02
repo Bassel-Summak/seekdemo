@@ -20,7 +20,7 @@ SeekDemo is an application developed to simulate job acceptance. This applicatio
 ### Pages
 1. **Splash Screen**: Appears when the app starts.
 2. **Login Screen**: Validates user inputs.
-3. **Job List Screen**: Features two tabs to display applied and active job appendices.
+3. **Job List Screen**: Features two tabs to display applied and active job appendices with searching feature.
 4. **Job Details Screen**: Provides additional information about the selected job, with the option to apply.
 5. **Profile Screen**: Displays user information and allows users to modify their details, such as names.
 
@@ -30,8 +30,9 @@ SeekDemo is an application developed to simulate job acceptance. This applicatio
 1. **Theme Support**: The app supports two themes (light and dark) and automatically switches based on the system color.
 2. **Local Data Storage**: User information and tokens are stored locally within the app.
 3. **Pagination**: Supports pagination to load items on the screen.
-4. **Tab Differentiation**: Tabs for applying to and viewing open jobs are separated for better UI clarity (required new API changes in JavaScript).
-5. **Unit Tests**: Authentication and job functionalities are accompanied by unit tests due to their critical nature.
+4. **Job Searching**: Adding the ability to search for a specific job position (required the new API changes in the project).
+5. **Tab Differentiation**: Tabs for applying to and viewing open jobs are separated for better UI clarity (required new API changes in JavaScript).
+6. **Unit Tests**: Authentication and job functionalities are accompanied by unit tests due to their critical nature.
 
 <br />
 
